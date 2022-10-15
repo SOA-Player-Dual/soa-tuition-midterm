@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('student_id', 8);
             $table->string('full_name');
             $table->integer('tuition_fee');
+            $table->integer('reduction');
             $table->integer('status');
             $table->timestamps();
         });

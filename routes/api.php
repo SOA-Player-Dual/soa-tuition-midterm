@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TuitionController;
+use App\Http\Controllers\OTPController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,6 +17,6 @@ use App\Http\Controllers\TuitionController;
 
 Route::get('/get-tuition', [TuitionController::class, 'index']);
 
-Route::post('/verifyOTP', [TuitionController::class, 'verifyOTP']);
-Route::post('/otp-send', [TuitionController::class, 'sendOTPMail']);
-Route::post('/otp-resend', [TuitionController::class, 'resendOTPMail']);
+Route::post('/otp/verify', [OTPController::class, 'verify']);
+Route::post('/otp/send', [OTPController::class, 'send']);
+Route::post('/otp/resend', [OTPController::class, 'resend']);

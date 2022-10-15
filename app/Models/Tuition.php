@@ -16,6 +16,7 @@ class Tuition extends Model
         'student_id',
         'full_name',
         'tuition_fee',
+        'reduction',
         'status',
         'created_at',
         'updated_at',

@@ -15,6 +15,7 @@
 
         body {
             background-color: rgb(241, 242, 245);
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -36,15 +37,18 @@
                 width: 100%;
                 height: 100vh;
                 line-height: 2;
-                display: flex;
-                align-items: center;
-                justify-content: center;
+                position: relative;
             "
 >
     <div
         style="
-                    margin: 50px auto;
-                    width: 70%;
+                    position: fixed;
+                    margin: auto;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    width: 80%;
                     height: fit-content;
                     padding: 20px 0;
                     border: 1px solid rgba(22, 24, 35, 0.09);
@@ -56,7 +60,7 @@
         <div style="border-bottom: 1px solid #eee">
             <img
                 src="./assets/logo.png"
-                style="width: 70px; height: 70px"
+                style="width: 110px; height: 110px"
                 alt=""
             />
         </div>
