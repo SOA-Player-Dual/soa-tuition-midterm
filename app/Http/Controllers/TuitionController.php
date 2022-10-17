@@ -24,8 +24,10 @@ class TuitionController extends Controller
             $tuition = Tuition::where('student_id', $request->student_id)->first();
             if ($tuition) {
                 return response()->json([
+                    'student_id' => $tuition->student_id,
                     'full_name' => $tuition->full_name,
                     'tuition_fee' => $tuition->tuition_fee,
+                    'tuition_status' => $tuition->status,
                 ], 200);
             } else {
                 return response()->json([

@@ -30,6 +30,7 @@ class TuitionPaymentRequest extends FormRequest
             'mail' => 'required|email',
             'tuition_fee' => 'required',
             'fullname' => 'required',
+            'reduction' => 'required',
         ];
     }
 

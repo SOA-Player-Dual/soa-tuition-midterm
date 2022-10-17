@@ -17,6 +17,7 @@ class OTPCode extends Model
         'email',
         'student_id',
         'tuition_fee',
+        'reduction',
         'expired_at',
         'created_at',
         'updated_at',

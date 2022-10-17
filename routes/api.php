@@ -17,6 +17,12 @@ use App\Http\Controllers\OTPController;
 
 Route::get('/get-tuition', [TuitionController::class, 'index']);
 
-Route::post('/otp/verify', [OTPController::class, 'verify']);
-Route::post('/otp/send', [OTPController::class, 'send']);
-Route::post('/otp/resend', [OTPController::class, 'resend']);
+//Route::post('/otp/verify', [OTPController::class, 'verify']);
+//Route::post('/otp/send', [OTPController::class, 'send']);
+//Route::post('/otp/resend', [OTPController::class, 'resend']);
+
+Route::prefix('otp')->group(function () {
+    Route::post('/verify', [OTPController::class, 'verify']);
+    Route::post('/send', [OTPController::class, 'send']);
+    Route::post('/resend', [OTPController::class, 'resend']);
+});

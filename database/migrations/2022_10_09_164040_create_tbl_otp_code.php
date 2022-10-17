@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('student_id', 8);
             $table->string('otp_code', 6)->unique();
             $table->integer('tuition_fee');
+            $table->integer('reduction')->default(0);
             $table->string('email');
             $table->timestamp('expired_at');
             $table->timestamps();

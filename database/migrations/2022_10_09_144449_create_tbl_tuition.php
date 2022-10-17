@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('tbl_tuition', function (Blueprint $table) {
-            $table->string('student_id', 8);
+            $table->string('student_id', 8)->primary();
             $table->string('full_name');
             $table->integer('tuition_fee');
             $table->integer('reduction');
