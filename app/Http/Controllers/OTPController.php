@@ -19,6 +19,10 @@ class OTPController extends Controller
             return response()->json([
                 'error' => 'Student\'s tuition has been paid',
             ], 422);
+        } else if (OTPCode::where('student_id', $request->student_id)->first()) {
+            return response()->json([
+                'error' => 'This student number is in the process of paying tuition by another account'
+            ], 422);
         } else {
             $otp_code = rand(100000, 999999);
             $result = OTPCode::create([
