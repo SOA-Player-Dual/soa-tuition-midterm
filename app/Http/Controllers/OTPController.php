@@ -11,77 +11,115 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 
+
 class OTPController extends Controller
 {
     public function send(TuitionPaymentRequest $request){
-        $tuition = Tuition::where('student_id', $request->student_id)->first();
-        if ($tuition['status'] == 1) {
-            return response()->json([
-                'error' => 'Student\'s tuition has been paid',
-            ], 422);
-        } else if (OTPCode::where('student_id', $request->student_id)->first()) {
-            return response()->json([
-                'error' => 'This student number is in the process of paying tuition by another account'
-            ], 422);
+        $otp_code = rand(100000, 999999);
+        $student_id = '';
+        $user_id = '';
+        if ($request->has('otp_id')) {
+            $otp = OTPCode::where('id', $request->otp_id)->first();
+            if (!$otp) {
+                return response()->json([
+                    'message' => 'OTP not found',
+                ], 404);
+            }
+            $student_id = $otp->student_id;
+            $user_id = $otp->user_id;
         } else {
-            $otp_code = rand(100000, 999999);
+            $student_id = $request->student_id;
+            $user_id = $request->user_id;
+        }
+        $mail = Http::get('http://localhost:8000/api/get-email', [
+            'user_id' => $user_id,
+        ]);
+        if (!$mail['email']) {
+            return response()->json([
+                'message' => 'Failed to get email',
+            ], 422);
+        }
+        $tuition = Tuition::where('student_id', $student_id)->first();
+        if (!$tuition) {
+            return response()->json([
+                'message' => 'Failed to get tuition',
+            ], 422);
+        }
+
+        if ($request->otp_id) {
+            $updateOTP = $otp->update([
+                'otp_code' => $otp_code,
+                'expired_at' => Carbon::now()->addMinutes(5),
+            ]);
+            if ($updateOTP) {
+                $sent = Mail::to($mail['email'])->send(new OTPMail([
+                    'student_id' => $tuition->student_id,
+                    'otp' => $otp_code,
+                    'tuition_fee' => $tuition->tuition_fee,
+                    'fullname' => $tuition->full_name,
+                ]));
+                if ($sent) {
+                    return response()->json([
+                        'otp_id' => $otp->id,
+                        'message' => 'OTP code has been sent to your email',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Failed to send OTP code to your email',
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'message' => 'Failed to update OTP code to your email',
+                ], 500);
+            }
+        } else {
+            if ($tuition['status'] == 1) {
+                return response()->json([
+                    'message' => 'Student\'s tuition has been paid',
+                ], 422);
+            }
+            if (OTPCode::where('student_id', $request->student_id)->first()) {
+                return response()->json([
+                    'message' => 'This student number is in the process of paying tuition by another account'
+                ], 422);
+            }
             $result = OTPCode::create([
-                'email' => $request->mail,
                 'otp_code' => $otp_code,
                 'student_id' => $request->student_id,
-                'tuition_fee' => $request->tuition_fee,
+                'user_id' => $request->user_id,
                 'expired_at' => Carbon::now()->addMinutes(5),
                 'created_at' => Carbon::now(),
             ]);
             if ($result) {
-                Mail::to($request->mail)->send(new OTPMail([
-                    'student_id' => $request->student_id,
+                $sent = Mail::to($mail['email'])->send(new OTPMail([
+                    'student_id' => $tuition->student_id,
                     'otp' => $otp_code,
-                    'tuition_fee' => $request->tuition_fee,
-                    'fullname' => $request->fullname,
+                    'tuition_fee' => $tuition->tuition_fee,
+                    'fullname' => $tuition->full_name,
                 ]));
-                return response()->json([
-                    'message' => 'OTP sent',
-                    'id' => $result->id,
-                ], 200);
+                if ($sent) {
+                    return response()->json([
+                        'otp_id' => $result->id,
+                        'message' => 'OTP code has been sent to your email',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Failed to send OTP code to your email',
+                    ], 422);
+                }
             } else {
                 return response()->json([
-                    'error' => 'OTP not sent',
+                    'message' => 'Failed to send OTP code to your email',
                 ], 500);
             }
-        }
-    }
-
-    public function resend(Request $request){
-        $otp_code = rand(100000, 999999);
-        $otp = OTPCode::where('id', $request->id)->first();
-        $result = $otp->update([
-            'otp_code' => $otp_code,
-            'expired_at' => Carbon::now()->addMinutes(5),
-            'updated_at' => Carbon::now(),
-        ]);
-        if ($result) {
-            Mail::to($otp->email)->send(new OTPMail([
-                'student_id' => $otp->student_id,
-                'otp' => $otp_code,
-                'tuition_fee' => $otp->tuition_fee,
-                'fullname' => $otp->fullname,
-            ]));
-            return response()->json([
-                'message' => 'OTP resent',
-                'id' => $otp->id,
-            ], 200);
-        }
-        else {
-            return response()->json([
-                'error' => 'OTP not resent',
-            ], 500);
         }
     }
 
     public function verify(Request $request){
         $otp = OTPCode::where('otp_code', $request->otp_code)->first();
         if($otp){
+            $tuition = Tuition::where('student_id', $otp->student_id)->first();
             if($otp->expired_at > Carbon::now()){
                 $otp->delete();
                 $tuition  = Tuition::where('student_id', $otp->student_id)->first();
@@ -90,14 +128,19 @@ class OTPController extends Controller
                     'updated_at' => date("Y/m/d H:i:s"),
                 ]);
 
-                $response = Http::post('http://localhost:8012/authenticate-service/public/api/payment', [
-                    'amount' => $otp->tuition_fee - $otp->reduction,
+                $response = Http::post('http://127.0.0.1:8000/api/payment', [
+                    'amount' => $tuition->tuition_fee - $tuition->reduction,
                     'id' => $request->id,
                 ]);
-
-                return response()->json([
-                    'message' => 'success',
-                ], 200);
+                if ($response->status() == 200) {
+                    return response()->json([
+                        'message' => 'Tuition has been paid',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Failed to pay tuition',
+                    ], 500);
+                }
             }else{
                 $otp->delete();
                 return response()->json([

@@ -14,10 +14,8 @@ class OTPCode extends Model
 
     protected $fillable = [
         'otp_code',
-        'email',
         'student_id',
-        'tuition_fee',
-        'reduction',
+        'user_id',
         'expired_at',
         'created_at',
         'updated_at',

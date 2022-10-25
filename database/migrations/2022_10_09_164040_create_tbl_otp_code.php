@@ -15,11 +15,9 @@ return new class extends Migration
     {
         Schema::create('tbl_otp_code', function (Blueprint $table) {
             $table->integer('id')->autoIncrement();
-            $table->string('student_id', 8);
+            $table->string('student_id', 8)->unique();
+            $table->string('user_id');
             $table->string('otp_code', 6)->unique();
-            $table->integer('tuition_fee');
-            $table->integer('reduction')->default(0);
-            $table->string('email');
             $table->timestamp('expired_at');
             $table->timestamps();
         });

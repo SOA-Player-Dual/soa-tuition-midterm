@@ -24,5 +24,4 @@ Route::get('/get-tuition', [TuitionController::class, 'index']);
 Route::prefix('otp')->group(function () {
     Route::post('/verify', [OTPController::class, 'verify']);
     Route::post('/send', [OTPController::class, 'send']);
-    Route::post('/resend', [OTPController::class, 'resend']);
 });

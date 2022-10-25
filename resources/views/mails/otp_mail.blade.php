@@ -59,24 +59,24 @@
     >
         <div style="border-bottom: 1px solid #eee">
             <img
-                src="./assets/logo.png"
+                src="{{asset('/logo.png')}}"
                 style="width: 110px; height: 110px"
                 alt=""
             />
         </div>
-        <p style="font-size: 1.1em">Hi, jungjung</p>
+        <p style="font-size: 1.1em">Hi, {{$mailData['fullname']}}</p>
         <p>Your information tuition is:</p>
         <div style="padding: 0 0 0 32px">
             <p style="margin: 0; opacity: 0.6">
-                - Full name: Jung Jung
+                - Full name: {{$mailData['fullname']}}
             </p>
             <p style="margin: 0; opacity: 0.6">
-                - Student ID: 519034041
+                - Student ID: {{$mailData['student_id']}}
             </p>
             <p style="margin: 0">
                 <span style="opacity: 0.6">- Tuition:</span>
                 <span style="opacity: 1; color: #fe2c55"
-                >5.990.000 VND</span
+                >{{$mailData['tuition_fee']}} VND</span
                 >
             </p>
         </div>
@@ -94,7 +94,7 @@
                         border-radius: 4px;
                     "
         >
-            324457
+            {{$mailData['otp']}}
         </h2>
         <p style="font-size: 0.9em">
             Regards,<br />Ton Duc Thang University

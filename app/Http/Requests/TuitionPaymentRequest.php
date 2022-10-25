@@ -26,19 +26,9 @@ class TuitionPaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'student_id' => 'required',
-            'mail' => 'required|email',
-            'tuition_fee' => 'required',
-            'fullname' => 'required',
-            'reduction' => 'required',
+            'otp_id',
+            'student_id',
+            'user_id',
         ];
-    }
-
-    protected function failedValidation(Validator $validator)
-    {
-        $response = response()->json([
-            'error' => $validator->errors(),
-        ], 422);
-        throw (new ValidationException($validator, $response));
     }
 }
