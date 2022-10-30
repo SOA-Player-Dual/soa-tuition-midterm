@@ -26,9 +26,8 @@ class TuitionPaymentRequest extends FormRequest
     public function rules()
     {
         return [
-            'otp_id',
-            'student_id',
-            'user_id',
+            'student_id' => 'required',
+            'user_id' => 'required',
         ];
     }
 }
