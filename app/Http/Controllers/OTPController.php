@@ -29,10 +29,10 @@ class OTPController extends Controller
                 'msg' => 'Tuition fee already paid',
             ], 422);
         }
-        $mail = Http::get('https://soa-midterm.000webhostapp.com/api/get-email', [
+        $user = Http::get('https://soa-midterm.000webhostapp.com/api/get-user', [
             'user_id' => $user_id,
         ]);
-        if (!$mail){
+        if (!$user){
             return response()->json([
                 'msg' => 'Cannot find email of user',
             ], 404);
@@ -48,11 +48,12 @@ class OTPController extends Controller
                 $otp->updated_at = Carbon::now()->addMinutes(5);
                 $updateOTP = $otp->save();
                 if ($updateOTP){
-                    $sent = Mail::to($mail['email'])->send(new OTPMail([
+                    $sent = Mail::to($user['email'])->send(new OTPMail([
                         'student_id' => $tuition->student_id,
                         'otp' => $otp_code,
                         'tuition_fee' => $tuition->tuition_fee,
-                        'fullname' => $tuition->full_name,
+                        'user_name' => $user['fullname'],
+                        'student_name' => $tuition->full_name,
                     ]));
                     if ($sent){
                         return response()->json([
@@ -77,11 +78,12 @@ class OTPController extends Controller
             $otp->expired_at = Carbon::now()->addMinutes(5);
             $saveOTP = $otp->save();
             if ($saveOTP){
-                $sent = Mail::to($mail['email'])->send(new OTPMail([
+                $sent = Mail::to($user['email'])->send(new OTPMail([
                     'student_id' => $tuition->student_id,
                     'otp' => $otp_code,
                     'tuition_fee' => $tuition->tuition_fee,
-                    'fullname' => $tuition->full_name,
+                    'user_name' => $user['fullname'],
+                    'student_name' => $tuition->full_name,
                 ]));
                 if ($sent){
                     return response()->json([
@@ -105,7 +107,6 @@ class OTPController extends Controller
         if($otp){
             $tuition = Tuition::where('student_id', $otp->student_id)->first();
             if($otp->expired_at > Carbon::now()){
-                $otp->delete();
                 $tuition  = Tuition::where('student_id', $otp->student_id)->first();
                 $tuition->update([
                     'status' => 1,
@@ -116,6 +117,7 @@ class OTPController extends Controller
                     'amount' => $tuition->tuition_fee - $tuition->reduction,
                     'id' => $request->user_id,
                 ]);
+                $otp->delete();
                 if ($response->status() == 200) {
                     return response()->json([
                         'msg' => 'Tuition has been paid',

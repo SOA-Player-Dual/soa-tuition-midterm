@@ -64,11 +64,11 @@
                 alt=""
             />
         </div>
-        <p style="font-size: 1.1em">Hi, {{$mailData['fullname']}}</p>
+        <p style="font-size: 1.1em">Hi, {{$mailData['user_name']}}</p>
         <p>Your information tuition is:</p>
         <div style="padding: 0 0 0 32px">
             <p style="margin: 0; opacity: 0.6">
-                - Full name: {{$mailData['fullname']}}
+                - Full name: {{$mailData['student_name']}}
             </p>
             <p style="margin: 0; opacity: 0.6">
                 - Student ID: {{$mailData['student_id']}}
