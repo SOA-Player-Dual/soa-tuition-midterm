@@ -104,7 +104,7 @@ class OTPController extends Controller
     }
 
     public function verify(Request $request){
-        $otp = OTPCode::where('otp_code', $request->otp_code)->first();
+        $otp = OTPCode::where('otp_code', $request->otp_code)->where('user_id', $request->user_id)->first();
         if($otp){
             $tuition = Tuition::where('student_id', $otp->student_id)->first();
             if($otp->expired_at > Carbon::now()){

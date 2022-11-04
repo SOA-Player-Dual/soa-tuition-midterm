@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('id')->autoIncrement();
             $table->string('student_id', 8)->unique();
             $table->foreign('student_id')->references('student_id')->on('tbl_tuition');
-            $table->string('user_id');
+            $table->integer('user_id');
             $table->string('otp_code', 6)->unique();
             $table->timestamp('expired_at');
             $table->timestamps();
