@@ -21,12 +21,12 @@ class OTPController extends Controller
         $tuition = Tuition::where('student_id', $student_id)->first();
         if (!$tuition){
             return response()->json([
-                'msg' => 'Tuiton of student ID not found',
+                'error' => 'Tuiton of student ID not found',
             ], 404);
         }
         if ($tuition->status == 1){
             return response()->json([
-                'msg' => 'Tuition fee already paid',
+                'error' => 'Tuition fee already paid',
             ], 422);
         }
         $user = Http::get('https://soa-midterm.000webhostapp.com/api/get-user', [
@@ -34,15 +34,15 @@ class OTPController extends Controller
         ]);
         if (!$user){
             return response()->json([
-                'msg' => 'Cannot find email of user',
+                'error' => 'Cannot find email of user',
             ], 404);
         }
         $otp = OTPCode::where('student_id', $student_id)->first();
         if ($otp){
             if ($otp->user_id != $user_id && $otp->expired_at > Carbon::now()) {
                 return response()->json([
-                    'msg' => 'This student number is in the process of paying tuition by another account'
-                ], 422);
+                    'error' => 'This student id is in the process of paying tuition by another account'
+                ], 403);
             } else {
                 $otp->otp_code = $otp_code;
                 $otp->user_id = $user_id;
@@ -62,12 +62,12 @@ class OTPController extends Controller
                         ], 200);
                     } else {
                         return response()->json([
-                            'msg' => 'Cannot send OTP code to your email',
+                            'error' => 'Cannot send OTP code to your email',
                         ], 500);
                     }
                 } else {
                     return response()->json([
-                        'msg' => 'Cannot update OTP code',
+                        'error' => 'Cannot update OTP code',
                     ], 500);
                 }
             }
@@ -92,12 +92,12 @@ class OTPController extends Controller
                     ], 200);
                 } else {
                     return response()->json([
-                        'msg' => 'Cannot send OTP code to your email',
+                        'error' => 'Cannot send OTP code to your email',
                     ], 500);
                 }
             } else {
                 return response()->json([
-                    'msg' => 'Cannot generate OTP code',
+                    'error' => 'Cannot generate OTP code',
                 ], 500);
             }
         }
@@ -127,18 +127,18 @@ class OTPController extends Controller
                     ], 200);
                 } else {
                     return response()->json([
-                        'msg' => 'Failed to pay tuition',
+                        'error' => 'Failed to pay tuition',
                     ], 500);
                 }
             }else{
                 $otp->delete();
                 return response()->json([
-                    'msg' => 'expired',
+                    'error' => 'expired',
                 ], 410);
             }
         }else{
             return response()->json([
-                'msg' => 'failed',
+                'error' => 'failed',
             ], 400);
         }
     }
