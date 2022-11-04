@@ -15,7 +15,7 @@
 
         body {
             background-color: rgb(241, 242, 245);
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -50,59 +50,60 @@
                     left: 0;
                     width: 80%;
                     height: fit-content;
-                    padding: 20px 0;
+                    padding: 0 12px;
                     border: 1px solid rgba(22, 24, 35, 0.09);
                     border-radius: 8px;
-                    padding: 12px;
                     background-color: rgb(255, 255, 255);
                 "
     >
-        <div style="border-bottom: 1px solid #eee">
-            <img
-                src="{{asset('/logo.png')}}"
-                style="width: 110px; height: 110px"
-                alt=""
-            />
+        <div>
+            <div style="border-bottom: 1px solid #eee">
+                <img
+                    src="{{asset('/logo.png')}}"
+                    style="width: 110px; height: 110px; display: block"
+                    alt=""
+                />
+            </div>
+            <p style="font-size: 1.1em">Hi, {{$mailData['user_name']}}</p>
+            <p>Your information tuition is:</p>
+            <div style="padding: 0 0 0 32px">
+                <p style="margin: 0; opacity: 0.6">
+                    Full name: {{$mailData['student_name']}}
+                </p>
+                <p style="margin: 0; opacity: 0.6">
+                    Student ID: {{$mailData['student_id']}}
+                </p>
+                <p style="margin: 0">
+                    <span style="opacity: 0.6">Tuition:</span>
+                    <span style="opacity: 1; color: #fe2c55"
+                    >{{$mailData['tuition_fee']}} VND</span
+                    >
+                </p>
+            </div>
+            <p>
+                Use the following OTP to complete your Tuition fee
+                procedures. OTP is valid for 5 minutes
+            </p>
+            <h2
+                style="
+                            background: #fe2c55;
+                            margin: 0 auto;
+                            width: max-content;
+                            padding: 0 10px;
+                            color: #fff;
+                            border-radius: 4px;
+                        "
+            >
+                {{$mailData['otp']}}
+            </h2>
         </div>
-        <p style="font-size: 1.1em">Hi, {{$mailData['user_name']}}</p>
-        <p>Your information tuition is:</p>
-        <div style="padding: 0 0 0 32px">
-            <p style="margin: 0; opacity: 0.6">
-                - Full name: {{$mailData['student_name']}}
-            </p>
-            <p style="margin: 0; opacity: 0.6">
-                - Student ID: {{$mailData['student_id']}}
-            </p>
-            <p style="margin: 0">
-                <span style="opacity: 0.6">- Tuition:</span>
-                <span style="opacity: 1; color: #fe2c55"
-                >{{$mailData['tuition_fee']}} VND</span
-                >
-            </p>
-        </div>
-        <p>
-            Use the following OTP to complete your Tuition fee
-            procedures. OTP is valid for 5 minutes
-        </p>
-        <h2
-            style="
-                        background: #fe2c55;
-                        margin: 0 auto;
-                        width: max-content;
-                        padding: 0 10px;
-                        color: #fff;
-                        border-radius: 4px;
-                    "
-        >
-            {{$mailData['otp']}}
-        </h2>
         <p style="font-size: 0.9em">
             Regards,<br />Ton Duc Thang University
         </p>
         <hr style="border: none; border-top: 1px solid #eee" />
         <div
             style="
-                        float: right;
+                        float: center;
                         padding: 8px 0;
                         color: #aaa;
                         font-size: 0.8em;

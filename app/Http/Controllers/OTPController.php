@@ -39,13 +39,14 @@ class OTPController extends Controller
         }
         $otp = OTPCode::where('student_id', $student_id)->first();
         if ($otp){
-            if ($otp->user_id != $user_id) {
+            if ($otp->user_id != $user_id && $otp->expired_at > Carbon::now()) {
                 return response()->json([
                     'msg' => 'This student number is in the process of paying tuition by another account'
                 ], 422);
             } else {
                 $otp->otp_code = $otp_code;
-                $otp->updated_at = Carbon::now()->addMinutes(5);
+                $otp->user_id = $user_id;
+                $otp->expired_at = Carbon::now()->addMinutes(5);
                 $updateOTP = $otp->save();
                 if ($updateOTP){
                     $sent = Mail::to($user['email'])->send(new OTPMail([
@@ -107,6 +108,7 @@ class OTPController extends Controller
         if($otp){
             $tuition = Tuition::where('student_id', $otp->student_id)->first();
             if($otp->expired_at > Carbon::now()){
+                $otp->delete();
                 $tuition  = Tuition::where('student_id', $otp->student_id)->first();
                 $tuition->update([
                     'status' => 1,
@@ -116,8 +118,9 @@ class OTPController extends Controller
                 $response = Http::post('https://soa-midterm.000webhostapp.com/api/payment', [
                     'amount' => $tuition->tuition_fee - $tuition->reduction,
                     'id' => $request->user_id,
+                    'student_id' => $tuition->student_id,
+                    'student_name' => $tuition->full_name,
                 ]);
-                $otp->delete();
                 if ($response->status() == 200) {
                     return response()->json([
                         'msg' => 'Tuition has been paid',
@@ -131,12 +134,12 @@ class OTPController extends Controller
                 $otp->delete();
                 return response()->json([
                     'msg' => 'expired',
-                ], 200);
+                ], 410);
             }
         }else{
             return response()->json([
                 'msg' => 'failed',
-            ], 200);
+            ], 400);
         }
     }
 }
